@@ -1,0 +1,8 @@
+{
+  "appId": "pe.misfinanzas.app",
+  "appName": "Mis Finanzas",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

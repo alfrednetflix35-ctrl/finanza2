@@ -1,0 +1,48 @@
+name: Compilar APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el proyecto
+        uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Crear el proyecto Android
+        run: npx cap add android
+
+      - name: Agregar el código de lectura de notificaciones
+        run: node scripts/patch-android.js
+
+      - name: Copiar la app web al proyecto Android
+        run: npx cap sync android
+
+      - name: Compilar el APK
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Guardar el APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MisFinanzas-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
